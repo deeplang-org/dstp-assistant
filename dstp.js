@@ -115,14 +115,16 @@ function sendDstpFrame(cmd, payload){
     buf[idx + 1] = 0xE3
     buf[idx + 2] = checkSum(buf, frameSize)
     console.log('DSTP frame:',buf.toString('hex'))
-    //send(buf)
+    send(buf)
 }
+
 function sendFileInfo() {
     fs.stat('./fib.dp', function(err, stats) {
         if(err){
             console.log(err)
         }
         //console.log(stats);
+        cleanBuf();
         fileinfo.name = './fib.dp'
         fileinfo.size = stats.size
         payloadSize = 2 + fileinfo.name.length
@@ -133,6 +135,26 @@ function sendFileInfo() {
         nameinfo.fill(fileinfo.name)
         nameinfo.copy (payload, 2, 0, fileinfo.name.length - 1)
         sendDstpFrame (0x03, payload)
+        setTimeout(function(){
+            var str = recvBuf.toString();
+            //console.log(str)
+            var out = str.match(/fe5a[a-f0-9]+/)
+            if (out){
+                console.log(out.toString())
+                var headAck = out.toString().match(/fe5a02/)
+                var tail = out.toString().match(/fae3/)
+                if (!(headAck && tail)) {
+                    console.log("no dstp head, ack or tail")
+                    return
+                }
+                console.log("dstp ack frame")
+                cleanBuf()
+                //sendFilePacket()
+            } else {
+                console.log('Check dstp ack fail')
+                return
+            }
+        }, 1000)
     });
 }
 
