@@ -89,7 +89,7 @@ function exitREPL(){
     }, 1000)
 }
 
-const fs = require('fs');
+const fs = require('fs')
 const { info } = require('console')
 fileinfo = {name:'', type:'', size:0, offset:0}
 function checkSum (buf, len) {
@@ -156,6 +156,10 @@ function sendFileInfo() {
             }
         }, 1000)
     });
+}
+
+function sendFilePacket(){
+    
 }
 
 startDownloadFileWithCheckVersion()
